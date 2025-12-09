@@ -1,33 +1,31 @@
 node {
 
-    stage('Prepare Environment') {
-        echo "Setting up JDK and Maven..."
-
-        env.MAVEN_HOME = tool name: 'maven-3.8.6', type: 'maven'
-        env.JAVA_HOME  = tool name: 'jdk11', type: 'jdk'
-        env.PATH = "${env.MAVEN_HOME}/bin:${env.JAVA_HOME}/bin:${env.PATH}"
-
-        sh "java -version"
-        sh "mvn -version"
+    stage('Checkout') {
+        checkout scm
     }
 
-    stage('Checkout Code') {
-        checkout([$class: 'GitSCM',
-            branches: [[name: '*/patch-1']],
-            userRemoteConfigs: [[url: 'https://github.com/skdevops888/Java-Projects-Collections.git']]
-        ])
+    stage('Build ATM Project') {
+        sh "cd ATM/ATM && mvn clean package -DskipTests"
     }
 
-    stage('Build Project') {
-        sh "mvn clean package -DskipTests"
+    stage('SonarQube Analysis') {
+        withSonarQubeEnv('sonar') {    // sonar = name configured in Jenkins
+            sh """
+                cd ATM/ATM
+                mvn clean verify sonar:sonar \
+                -Dsonar.projectKey=ATM-Project \
+                -Dsonar.projectName='ATM Java Project'
+            """
+        }
+    }
+
+    stage('Quality Gate') {
+        timeout(time: 2, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
     }
 
     stage('Archive Artifact') {
-        archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+        archiveArtifacts artifacts: 'ATM/ATM/target/*.jar', fingerprint: true
     }
-
-    stage('Cleanup Workspace') {
-        cleanWs()
-    }
-
 }

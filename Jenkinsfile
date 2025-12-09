@@ -25,7 +25,7 @@ node {
     stage('SonarQube Analysis') {
         withSonarQubeEnv('sonar') {
             sh """
-                cd ATM/ATM
+                cd ATM
                 mvn clean verify sonar:sonar \
                 -Dsonar.projectKey=ATM-Project \
                 -Dsonar.projectName='ATM Java Project'
@@ -40,6 +40,6 @@ node {
     }
 
     stage('Archive Artifact') {
-        archiveArtifacts artifacts: 'ATM/ATM/target/*.jar', fingerprint: true
+        archiveArtifacts artifacts: 'ATM/target/*.jar', fingerprint: true
     }
 }

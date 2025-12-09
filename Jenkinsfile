@@ -17,7 +17,7 @@ node {
 
     stage('Build ATM Project') {
         sh """
-            cd ATM/ATM
+            cd ATM
             mvn clean package -DskipTests
         """
     }

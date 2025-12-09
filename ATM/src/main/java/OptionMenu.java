@@ -1,50 +1,47 @@
-import java.text.DecimalFormat; // Import for formatting balance outputs as currency
-import java.util.HashMap; // Import for storing customer number and PIN pairs
-import java.util.Scanner; // Import for capturing user input from the console
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class OptionMenu extends Account {
 
-    Scanner menuInput = new Scanner(System.in); // Scanner object for reading user input
-    DecimalFormat moneyFormat = new DecimalFormat("'$'###,##0.00"); // Currency formatter
+    Scanner menuInput = new Scanner(System.in);
+    DecimalFormat moneyFormat = new DecimalFormat("'$'###,##0.00");
 
-    HashMap<Integer, Integer> data = new HashMap<>(); // Stores customer number as key, PIN as value
+    HashMap<Integer, Integer> data = new HashMap<>();
 
-    // Handles login process
     public void getLogin() {
         int x = 1;
+
         do {
             try {
-                // Predefined dummy accounts
                 data.put(952141, 191904);
                 data.put(989947, 717976);
 
                 System.out.println("Welcome to ATM");
                 System.out.println("Enter your Customer Number");
-                setCustomerNumber(menuInput.nextInt()); // Reads and sets customer number
+                setCustomerNumber(menuInput.nextInt());
 
                 System.out.println("Enter your PIN Number");
-                setPinNumber(menuInput.nextInt()); // Reads and sets PIN
+                setPinNumber(menuInput.nextInt());
             }
-            catch(Exception e) {
-                // Handles non-numeric input
+            catch (Exception e) {
                 System.out.println("\nInvalid Characters Only Numbers Allowed\n" + e);
-                x = 2; // Prevents loop continuation on error
+                menuInput.nextLine();
+                x = 2;
             }
 
             int cn = getCustomerNumber();
             int pn = getPinNumber();
 
-            // Validates login credentials
             if (data.containsKey(cn) && data.get(cn) == pn) {
-                getAccountType(); // Proceed to account menu
-            }
-            else {
+                getAccountType();
+            } else {
                 System.out.println("\nWrong Customer Number or Wrong PIN Number\n\n");
             }
-        } while (x == 1); // Loop continues until valid login or exception
+
+        } while (x == 1);
     }
 
-    // Displays account type options
     public void getAccountType() {
         System.out.println("Select Account Type you want to Access");
         System.out.println("Type 1 - Checking Account");
@@ -53,16 +50,25 @@ public class OptionMenu extends Account {
 
         int selection = menuInput.nextInt();
 
-        // Handles user selection
         switch (selection) {
-            case 1 -> getChecking(); // Redirects to checking account menu
-            case 2 -> getSaving();   // Redirects to saving account menu
-            case 3 -> System.out.println("Thank you for using ATM, BYE\n"); // Exit message
-            default -> System.out.println("\n Invalid Choice \n"); // Handles invalid input
+            case 1:
+                getChecking();
+                break;
+
+            case 2:
+                getSaving();
+                break;
+
+            case 3:
+                System.out.println("Thank you for using ATM, BYE\n");
+                break;
+
+            default:
+                System.out.println("\n Invalid Choice \n");
+                getAccountType();
         }
     }
 
-    // Menu for checking account options
     public void getChecking() {
         System.out.println("Checking Account");
         System.out.println("Type 1 - View Balance");
@@ -72,30 +78,32 @@ public class OptionMenu extends Account {
 
         int selection = menuInput.nextInt();
 
-        // Handles user selection
         switch (selection) {
-            case 1 -> {
-                // Display balance
+            case 1:
                 System.out.println("Checking Account Balance: " + moneyFormat.format(getCheckingBalance()));
-                getAccountType(); // Return to main menu
-            }
-            case 2 -> {
-                getCheckingWithdrawInput(); // Perform withdrawal
                 getAccountType();
-            }
-            case 3 -> {
-                getCheckingDepositInput(); // Perform deposit
+                break;
+
+            case 2:
+                getCheckingWithdrawInput();
                 getAccountType();
-            }
-            case 4 -> System.out.println("Thank you for using ATM, Bye"); // Exit message
-            default -> {
+                break;
+
+            case 3:
+                getCheckingDepositInput();
+                getAccountType();
+                break;
+
+            case 4:
+                System.out.println("Thank you for using ATM, Bye");
+                break;
+
+            default:
                 System.out.println("\nInvalid Choice\n");
-                getChecking(); // Re-prompt on invalid input
-            }
+                getChecking();
         }
     }
 
-    // Menu for saving account options
     public void getSaving() {
         System.out.println("Saving Account");
         System.out.println("Type 1 - View Balance");
@@ -106,26 +114,29 @@ public class OptionMenu extends Account {
 
         int selection = menuInput.nextInt();
 
-        // Handles user selection
         switch (selection) {
-            case 1 -> {
-                // Display balance
+            case 1:
                 System.out.println("Saving Account Balance: " + moneyFormat.format(getSavingBalance()));
-                getAccountType(); // Return to main menu
-            }
-            case 2 -> {
-                getSavingWithdrawInput(); // Perform withdrawal
                 getAccountType();
-            }
-            case 3 -> {
-                getSavingDepositInput(); // Perform deposit
+                break;
+
+            case 2:
+                getSavingWithdrawInput();
                 getAccountType();
-            }
-            case 4 -> System.out.println("Thank you for using ATM, Bye\n"); // Exit message
-            default -> {
+                break;
+
+            case 3:
+                getSavingDepositInput();
+                getAccountType();
+                break;
+
+            case 4:
+                System.out.println("Thank you for using ATM, Bye\n");
+                break;
+
+            default:
                 System.out.println("\nInvalid Choice\n");
-                getChecking(); // Re-prompt (note: this may be intended to redirect to saving, consider reviewing)
-            }
+                getSaving();
         }
     }
 }

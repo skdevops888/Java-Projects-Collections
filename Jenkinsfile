@@ -12,14 +12,16 @@ pipeline {
             steps {
                 echo 'Setting up Maven and JDK'
 
-                // Tool installation paths configured in Jenkins settings
-                def mvnHome = tool name: 'MAVEN3', type: 'maven'
-                def jdkHome = tool name: 'JDK17', type: 'jdk'
+                script {
+                    // Tool installation paths configured in Jenkins settings
+                    def mvnHome = tool name: 'MAVEN3', type: 'maven'
+                    def jdkHome = tool name: 'JDK17', type: 'jdk'
 
-                // Export environment variables
-                env.MAVEN_HOME = mvnHome
-                env.JAVA_HOME  = jdkHome
-                env.PATH = "${jdkHome}/bin:${mvnHome}/bin:${env.PATH}"
+                    // Export environment variables
+                    env.MAVEN_HOME = mvnHome
+                    env.JAVA_HOME  = jdkHome
+                    env.PATH = "${jdkHome}/bin:${mvnHome}/bin:${env.PATH}"
+                }
 
                 sh 'java -version'
                 sh 'mvn -version'

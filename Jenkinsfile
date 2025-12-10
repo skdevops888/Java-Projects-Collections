@@ -1,45 +1,35 @@
-node {
+pipeline {
+    agent any
 
-    stage('Checkout') {
-        checkout scm
-    }
-
-    stage('Setup Tools') {
-        echo "Setting up Maven and JDK"
-
-        env.MAVEN_HOME = tool 'maven-3.8.6'  
-        env.JAVA_HOME  = tool 'jdk21'        
-        env.PATH = "${env.MAVEN_HOME}/bin:${env.JAVA_HOME}/bin:${env.PATH}"
-
-        sh "mvn -version"
-        sh "java -version"
-    }
-
-    stage('Build ATM Project') {
-        sh """
-            cd ATM
-            mvn clean package -DskipTests
-        """
-    }
-
-    stage('SonarQube Analysis') {
-        withSonarQubeEnv('sonar') {
-            sh """
-                cd ATM
-                mvn clean verify sonar:sonar \
-                -Dsonar.projectKey=ATM-Project \
-                -Dsonar.projectName='ATM Java Project'
-            """
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/skdevops888/Java-Projects-Collections.git', branch: 'patch-1'
+            }
         }
-    }
 
-    stage('Quality Gate') {
-        timeout(time: 2, unit: 'MINUTES') {
-            waitForQualityGate abortPipeline: true
+        stage('Setup Tools') {
+            steps {
+                echo 'Setting up Maven and JDK'
+
+                // Tool installation paths configured in Jenkins settings
+                def mvnHome = tool name: 'MAVEN3', type: 'maven'
+                def jdkHome = tool name: 'JDK17', type: 'jdk'
+
+                // Export environment variables
+                env.MAVEN_HOME = mvnHome
+                env.JAVA_HOME  = jdkHome
+                env.PATH = "${jdkHome}/bin:${mvnHome}/bin:${env.PATH}"
+
+                sh 'java -version'
+                sh 'mvn -version'
+            }
         }
-    }
 
-    stage('Archive Artifact') {
-        archiveArtifacts artifacts: 'ATM/target/*.jar', fingerprint: true
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
     }
 }
